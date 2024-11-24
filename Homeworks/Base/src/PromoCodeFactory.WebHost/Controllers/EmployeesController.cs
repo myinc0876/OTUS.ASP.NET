@@ -55,20 +55,61 @@ namespace PromoCodeFactory.WebHost.Controllers
             if (employee == null)
                 return NotFound();
 
-            var employeeModel = new EmployeeResponse()
-            {
-                Id = employee.Id,
-                Email = employee.Email,
-                Roles = employee.Roles.Select(x => new RoleItemResponse()
-                {
-                    Name = x.Name,
-                    Description = x.Description
-                }).ToList(),
-                FullName = employee.FullName,
-                AppliedPromocodesCount = employee.AppliedPromocodesCount
-            };
+            EmployeeResponse employeeModel = EmployeesControllerHelpers.ToEmployeeResponse(employee);
 
             return employeeModel;
+
+        }
+
+        /// <summary>
+        /// Добавить новго сотрудника
+        /// </summary>
+        /// <param name="createEmployeeModel"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<ActionResult<EmployeeResponse>> CreateEmployeeAsync(CreateEmployeeModel createEmployeeModel)
+        {
+            Guid id = Guid.NewGuid();
+            await _employeeRepository.Create(new Employee
+            {
+                Id = id,
+                FirstName = createEmployeeModel.FirstName,
+                LastName = createEmployeeModel.LastName,
+                Email = createEmployeeModel.Email,
+            });
+
+            var employee = await _employeeRepository.GetByIdAsync(id);
+            EmployeeResponse employeeResponse = EmployeesControllerHelpers.ToEmployeeResponse(employee);
+            return employeeResponse;
+        }
+
+        /// <summary>
+        /// Обновить Email у сотрудника
+        /// </summary>
+        /// <param name="updateEmployeeEmail"></param>
+        /// <returns></returns>
+        [HttpPut]
+        public async Task<ActionResult<EmployeeResponse>> UpdateEmployeeEmailAsync(UpdateEmployeeEmail updateEmployeeEmail)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(updateEmployeeEmail.EmployeeId);
+            employee.Email = updateEmployeeEmail.NewEmail;
+
+            EmployeeResponse employeeResponse = EmployeesControllerHelpers.ToEmployeeResponse(employee);
+            return employeeResponse;
+        }
+
+        /// <summary>
+        /// Удалить сотрудника
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public async Task<ActionResult<bool>> UpdateEmployeeEmailAsync(Guid employeeId)
+        {
+            var employee = await _employeeRepository.GetByIdAsync(employeeId);
+            if (employee == null) return false;
+            await _employeeRepository.Delete(employee);
+            return true;
         }
     }
 }

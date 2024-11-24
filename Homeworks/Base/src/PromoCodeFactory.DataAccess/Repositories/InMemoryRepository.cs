@@ -8,21 +8,34 @@ namespace PromoCodeFactory.DataAccess.Repositories
 {
     public class InMemoryRepository<T>: IRepository<T> where T: BaseEntity
     {
-        protected IEnumerable<T> Data { get; set; }
+        protected List<T> Data { get; set; }
 
         public InMemoryRepository(IEnumerable<T> data)
         {
-            Data = data;
+            Data = new List<T>(data);
         }
 
         public Task<IEnumerable<T>> GetAllAsync()
         {
-            return Task.FromResult(Data);
+            //return await Data.ToArray();
+            return Task.FromResult((IEnumerable<T>)Data);
         }
 
         public Task<T> GetByIdAsync(Guid id)
         {
             return Task.FromResult(Data.FirstOrDefault(x => x.Id == id));
+        }
+
+        public Task Create(T t)
+        {
+            Data.Add(t);
+            return Task.CompletedTask;
+        }
+
+        public Task Delete(T t)
+        {
+            Data.Remove(t);
+            return Task.CompletedTask;
         }
     }
 }
