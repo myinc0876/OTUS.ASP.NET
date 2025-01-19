@@ -104,7 +104,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <param name="employeeId"></param>
         /// <returns></returns>
         [HttpDelete]
-        public async Task<ActionResult<bool>> UpdateEmployeeEmailAsync(Guid employeeId)
+        public async Task<ActionResult<bool>> DeleteEmployeeAsync(Guid employeeId)
         {
             var employee = await _employeeRepository.GetByIdAsync(employeeId);
             if (employee == null) return false;
