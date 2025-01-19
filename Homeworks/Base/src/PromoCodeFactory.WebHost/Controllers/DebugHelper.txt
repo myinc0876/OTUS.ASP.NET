@@ -1,0 +1,6 @@
+﻿-- отладка 
+{
+  "firstName": "Иванов",
+  "lastName": "Сергей",
+  "email": "mail@mail.mail"
+}
